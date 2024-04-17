@@ -1,26 +1,40 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { storeUser } from '../Redux/Reducer/authSlice';
 import { CustomButton } from '../components/buttons';
 import { CustomInputs } from '../components/inputs';
+import axios from 'axios';
 
 export const SignUp = () => {
 
-    const user = useSelector((state) => state.auth.user)
-    const dispatch = useDispatch()
-
     const navigation = useNavigation();
 
-    // const [username, setUsername] = useState('');
-    const [email, setEmail] = useState({'email': ''});
-    const [password, setPassword] = useState({'password': ''});
-    const [confirmPassword, setConfirmPassword] = useState({'confirm_password': ''});
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+
+    
 
     const onRegisterPressed = () => {
-        navigation.navigate("Login");
+        const data = {
+            username,
+            email,
+            password,
+            re_password: confirmPassword
+        };
+        axios.post('http://192.168.1.2:8000/api/v1/auth/users/', data)
+            .then((response) => {
+                console.log(response.data);
+                // handle successful sign up
+            })
+            .catch((error) => {
+                console.log(error.response.data);
+                // handle error
+            });
     }
+
     const onSignUpPressed = () => {
         navigation.navigate("Login")
     }
@@ -43,13 +57,14 @@ export const SignUp = () => {
                 <Text style={styles.title}>Create An Account.</Text>
                 <CustomInputs 
                     placeholder='Username' 
-                    value={user.Username} 
-                    setValue={(value) => dispatch(storeUser({...user, Username: value}))}
+                    value={username} 
+                    setValue={setUsername}
                 />
                 <CustomInputs 
                     placeholder='Email Address' 
                     value={email} 
                     setValue={setEmail}
+                    
                 />
                 <CustomInputs 
                     placeholder='Password' 
